@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width">
+  <title>Title</title>
+</head>
+<body>
+<svg id="gauage-chart" width="212" height="424">
+  <defs id="chart-defs">
+    <filter id="chart-panel-shadow">
+      <feOffset dx='0' dy='0'></feOffset> <!-- offset -->
+      <feGaussianBlur stdDeviation='4' result='offset-blur'></feGaussianBlur> <!-- blur -->
+      <feComposite operator='out' in='SourceGraphic' in2='offset-blur' result='inverse'></feComposite> <!-- invert -->
+      <feFlood flood-color='black' flood-opacity='0.4' result='color'></feFlood> <!-- color & opacity -->
+      <feComposite operator='in' in='color' in2='inverse' result='shadow'></feComposite> <!-- clip -->
+      <feComposite operator='over' in='shadow' in2='SourceGraphic'></feComposite> <!-- put -->
+    </filter>
+  </defs>
+  <circle id="chart-panel" cx="0" cy="212" r="195" fill="url(#chart-panel-gradient)" stroke-width="24" stroke="#FFF" style="filter:url(#chart-panel-shadow)"></circle>
+  <g id="chart-indicator" transform="translate(0, 212)"></g>
+  <g id="chart-gauage"></g>
+</svg>
+
+<script>
+  var dataPercent = 55;
+  
+  var chartSvg = document.getElementById('gauage-chart');
+  var chartPanelElement = document.getElementById('chart-panel');
+  var indicatorGroup = document.getElementById('chart-indicator');
+  var chartGauageElement = document.getElementById('chart-gauage');
+  var chartDefsElement = document.getElementById('chart-defs');
+
+  var gauageIndicators = [null, null, 3, null, null, 6, null, null, 9, null, null];
+  var gauageGradient = ['#FF4B00', null, null, '#FFA800', '#189CE5', null, null, null, null, '#1537E3', '#189CE5', '#FFA800', '#FFA800'];
+  
+  var divisionLength = gauageIndicators.length + 1;
+  var angleUnit = Math.PI / divisionLength;
+  
+  var indicatorRadius = 195;
+  
+  gauageIndicators.forEach(function(indicator, i) {
+    var svgElement = null;
+    var angle = (i + 1) * angleUnit,
+      radianX = Math.sin(angle),
+      radianY = Math.cos(angle);
+    
+    if (indicator === null) {
+      svgElement = createSvgElement({
+        tagName: 'line',
+        attrs: {
+          'x1': (indicatorRadius - 5) * radianX,
+          'y1': -((indicatorRadius - 5) * radianY),
+          'x2': (indicatorRadius + 5) * radianX,
+          'y2': -((indicatorRadius + 5) * radianY),
+          'stroke': '#D6D6D6'
+        }
+      });
+    } else {
+      svgElement = createSvgElement({
+        tagName: 'text',
+        text: indicator,
+        attrs: {
+          'x': (indicatorRadius - 5) * radianX,
+          'y': -((indicatorRadius - 5) * radianY),
+          'dy': radianY < 0 ? 5 : 1,
+          'style': 'font-size:11px;fill:#616161'
+        }
+      });
+    }
+    
+    indicatorGroup.appendChild(svgElement);
+  });
+
+  calculateGradientColor(gauageGradient);
+
+  var startAngle = 0, endAngle = 0,
+    gradientLength = gauageGradient.length - 1,
+    gradientIndex = 0,
+    percentUnit = 100 / gradientLength;
+  
+  while (dataPercent > 0) {
+    var gradientStartColor, gradientEndColor, linecap;
+  
+    if (dataPercent > percentUnit) {
+      startAngle = endAngle;
+      endAngle = startAngle + percentUnit * 1.8;
+      gradientStartColor = gauageGradient[gradientIndex];
+      gradientEndColor = gauageGradient[gradientIndex + 1];
+      linecap = 'butt';
+    } else {
+      startAngle = endAngle;
+      endAngle = startAngle + dataPercent * 1.8;
+      gradientStartColor = gauageGradient[gradientIndex];
+      gradientEndColor = calcGradientPoint(gauageGradient[gradientIndex], gauageGradient[gradientIndex + 1], dataPercent / percentUnit);
+      linecap = 'round';
+    }
+    
+    var gradientId = 'chart-gradient-' + gradientIndex;
+    var gradientAttrs = startAngle > 90
+      ? { x1: '100%', y1: '0%', x2: '0%', y2: '100%' }
+      : { x1: '0%', y1: '0%', x2: '100%', y2: '100%' };
+    var gradientDefElement = createGradientDefElement(gradientId, 'linearGradient', {
+      0: gradientStartColor,
+      100: gradientEndColor
+    }, gradientAttrs);
+    
+    var pathElement = createSvgElement({
+      tagName: 'path',
+      attrs: {
+        'd': describeArc(0, 212, 209, startAngle, endAngle),
+        'stroke': 'url(#' + gradientId + ')',
+        'stroke-width': 5,
+        'stroke-linecap': linecap
+      }
+    });
+  
+    chartDefsElement.appendChild(gradientDefElement);
+    chartGauageElement.appendChild(pathElement);
+    
+    dataPercent -= percentUnit;
+    gradientIndex++;
+  }
+  
+  var panelGradientStart = rgbToHsl(gradientEndColor);
+  var panelGradientEnd = { h: panelGradientStart.h, s: panelGradientStart.s, l: panelGradientStart.l - 12 };
+  
+  var chartPanelGradientDefElement = createGradientDefElement('chart-panel-gradient', 'radialGradient', {
+    0: panelGradientStart,
+    100: panelGradientEnd
+  });
+  
+  chartDefsElement.appendChild(chartPanelGradientDefElement);
+  
+  function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
+    var angleInRadians = (angleInDegrees-90) * Math.PI / 180.0;
+  
+    return {
+      x: centerX + (radius * Math.cos(angleInRadians)),
+      y: centerY + (radius * Math.sin(angleInRadians))
+    };
+  }
+
+  function describeArc(x, y, radius, startAngle, endAngle){
+    var start = polarToCartesian(x, y, radius, endAngle + 1);
+    var end = polarToCartesian(x, y, radius, startAngle - 1);
+    
+    var largeArcFlag = endAngle - startAngle <= 180 ? "0" : "1";
+  
+    return [ "M", start.x, start.y, "A", radius, radius, 0, largeArcFlag, 0, end.x, end.y].join(" ");
+  }
+  
+  function createSvgElement(options) {
+    var xmlns = 'http://www.w3.org/2000/svg';
+    var element = document.createElementNS(xmlns, options.tagName);
+    
+    if (options.text) {
+      element.innerHTML = options.text;
+    }
+  
+    if (options.attrs) {
+      setSvgAttributes(element, options.attrs);
+    }
+    
+    return element;
+  }
+  
+  function createGradientDefElement(id, tagName, colorMap, attrs) {
+    var gradientDef = createSvgElement({ tagName: tagName, attrs: { id: id } });
+    
+    if (attrs) {
+      setSvgAttributes(gradientDef, attrs);
+    }
+    
+    for (var offset in colorMap) {
+      if (colorMap.hasOwnProperty(offset)) {
+        var offsetElement = createSvgElement({
+          tagName: 'stop',
+          attrs: {
+            'offset': offset + '%',
+            'stop-color': toWebColorFormat(colorMap[offset])
+          }
+        });
+        
+        gradientDef.appendChild(offsetElement);
+      }
+    }
+    
+    return gradientDef;
+  }
+  
+  function setSvgAttributes(svg, attrs) {
+    for (var attr in attrs) {
+      if (attrs.hasOwnProperty(attr)) {
+        svg.setAttributeNS(null, attr, attrs[attr]);
+      }
+    }
+  }
+  
+  function calculateGradientColor(gradient) {
+    gradient = unifyColorArray(gradient, 'rgb');
+    
+    for (var i = 1; i < gradient.length - 1; i++) {
+      var color = gradient[i];
+      
+      if (color !== null) continue;
+  
+      var prevColor = gradient[i - 1];
+      var rate, nextColor;
+      
+      for (var j = i + 1; j < gradient.length - 1; j++) {
+        if (gradient[j] !== null) {
+          nextColor = gradient[j];
+          rate = 1 / (j - i  + 1);
+          break;
+        }
+      }
+      
+      gradient[i] = calcGradientPoint(prevColor, nextColor, rate);
+    }
+    
+    return gradient;
+  }
+  
+  function unifyColorArray(gradient, format) {
+    if (format === 'rgb') {
+      gradient.forEach(function(color, i, gradient) {
+        if (typeof color === 'string' && color[0] === '#') {
+          gradient[i] = hexToRgb(color.substr(1));
+        }
+      });
+    }
+    
+    return gradient;
+  }
+  
+  function calcGradientPoint(prevColor, nextColor, rate) {
+    return {
+      r: Math.floor(prevColor.r + (nextColor.r - prevColor.r) * rate),
+      g: Math.floor(prevColor.g + (nextColor.g - prevColor.g) * rate),
+      b: Math.floor(prevColor.b + (nextColor.b - prevColor.b) * rate)
+    };
+  }
+  
+  function toWebColorFormat(colorMap) {
+    var result = '';
+    
+    if (colorMap.hasOwnProperty('r') && colorMap.hasOwnProperty('g') && colorMap.hasOwnProperty('b')) {
+      result = 'rgb(' + colorMap.r + ',' + colorMap.g + ',' + colorMap.b + ')';
+    } else if (colorMap.hasOwnProperty('h') && colorMap.hasOwnProperty('s') && colorMap.hasOwnProperty('l')) {
+      result = 'hsl(' + colorMap.h + ',' + colorMap.s + '%,' + colorMap.l + '%)';
+    }
+    
+    return result;
+  }
+  
+  function hexToRgb(hex) {
+    return {
+      r: parseInt(hex.substring(0, 2), 16),
+      g: parseInt(hex.substring(2, 4), 16),
+      b: parseInt(hex.substring(4, 6), 16)
+    };
+  }
+  
+  function rgbToHsl(rgb) {
+    var r = rgb.r / 255, g = rgb.g / 255, b = rgb.b / 255,
+      max = Math.max(r, g, b), min = Math.min(r, g, b),
+      h = 0, s = 0, l = (max + min) / 2;
+    
+    if (max !== min) {
+      s = l < 0.5 ? (max - min) / (max + min) : (max - min) / (2.0 - max - min);
+      h = r === max ? (g - b) / (max - min) : g === max ? 2.0 + (b - r) / (max - min) : 4.0 + (r - g) / (max - min);
+    }
+  
+    h = h < 0 ? Math.round(h * 60 + 360) : Math.round(h * 60);
+    s = Math.round(s * 100);
+    l = Math.round(l * 100);
+    
+    
+    return { h: h, s: s, l: l }
+  }
+  
+  function rgbToHex(rgb) {
+    return toDoubleDigit(rgb.r.toString(16).toUpperCase())
+      + toDoubleDigit(rgb.g.toString(16).toUpperCase())
+      + toDoubleDigit(rgb.b.toString(16).toUpperCase());
+  }
+  
+  function toDoubleDigit(digit) {
+    return digit.length < 2 ? '0' + digit : digit;
+  }
+</script>
+</body>
+</html>
