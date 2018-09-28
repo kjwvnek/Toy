@@ -1,0 +1,63 @@
+
+@font-face {
+    font-family: 'Roboto';
+    src: url('../fonts/roboto-light.eot');
+    src: url('../fonts/roboto-light.eot?#iefix') format('embedded-opentype'),
+         url('../fonts/roboto-light.woff2') format('woff2'),
+         url('../fonts/roboto-light.woff') format('woff'),
+         url('../fonts/roboto-light.ttf') format('truetype'),
+         url('../fonts/roboto-light.svg#robotothin') format('svg');
+    font-weight: 300;
+}
+
+@font-face {
+    font-family: 'Roboto';
+    src: url('../fonts/roboto.eot');
+    src: url('../fonts/roboto.eot?#iefix') format('embedded-opentype'),
+         url('../fonts/roboto.woff2') format('woff2'),
+         url('../fonts/roboto.woff') format('woff'),
+         url('../fonts/roboto.ttf') format('truetype'),
+         url('../fonts/roboto.svg#robotoregular') format('svg');
+    font-weight: 400;
+}
+
+@font-face {
+    font-family: 'Roboto';
+    src: url('../fonts/roboto-bold.eot');
+    src: url('../fonts/roboto-bold.eot?#iefix') format('embedded-opentype'),
+         url('../fonts/roboto-bold.woff2') format('woff2'),
+         url('../fonts/roboto-bold.woff') format('woff'),
+         url('../fonts/roboto-bold.ttf') format('truetype'),
+         url('../fonts/roboto-bold.svg#robotobold') format('svg');
+    font-weight: 700;
+}
+
+@font-face {
+  font-family: 'Noto Sans CJK';
+  src: url('../fonts/NotoSansCJK-Light.eot');
+  src: url('../fonts/NotoSansCJK-Light.eot?#iefix') format('embedded-opentype'),
+       url('../fonts/NotoSansCJK-Light.woff2') format('woff2'),
+       url('../fonts/NotoSansCJK-Light.woff') format('woff'),
+       url('../fonts/NotoSansCJK-Light.otf') format('truetype');
+  font-weight: 300;
+}
+
+@font-face {
+  font-family: 'Noto Sans CJK';
+  src: url('../fonts/NotoSansCJK-Regular.eot');
+  src: url('../fonts/NotoSansCJK-Regular.eot?#iefix') format('embedded-opentype'),
+       url('../fonts/NotoSansCJK-Regular.woff2') format('woff2'),
+       url('../fonts/NotoSansCJK-Regular.woff') format('woff'),
+       url('../fonts/NotoSansCJK-Regular.otf') format('truetype');
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: 'Noto Sans CJK';
+  src: url('../fonts/NotoSansCJK-Bold.eot');
+  src: url('../fonts/NotoSansCJK-Bold.eot?#iefix') format('embedded-opentype'),
+       url('../fonts/NotoSansCJK-Bold.woff2') format('woff2'),
+       url('../fonts/NotoSansCJK-Bold.woff') format('woff'),
+       url('../fonts/NotoSansCJK-Bold.otf') format('truetype');
+  font-weight: 700;
+}

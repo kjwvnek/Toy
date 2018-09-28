@@ -1,0 +1,37 @@
+body,
+h1,h2,h3,h4,h5,h6,
+ol,ul,li,
+p {
+    margin: 0;
+    padding: 0;
+}
+
+form,fieldset,textarea,label,input,button {
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    border: 0;
+}
+
+li {
+    list-style: none;
+}
+
+em {
+    font-style: normal;
+}
+
+a {
+    text-decoration: none;
+}
+
+body {
+    line-height: 1.2;
+    font-family: 'Roboto','Noto Sans CJK',sans-serif;
+}
+
+* {
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.004);
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+}

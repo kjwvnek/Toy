@@ -1,0 +1,70 @@
+.lnb {position:relative;z-index:100;height:63px;background:linear-gradient(180deg, #fff, #fafafa) no-repeat 50% 50%/100% 100%;border-bottom:1px solid #f1f1f1;box-shadow:0 .5px .5px 0 #f5f5f5;background-color:#f8f8f8;font-size:0;}
+.lnb .inner {height:63px;}
+.lnb li {display:inline-block;width:25%;height: 63px;}
+.lnb a {display:block;width:100%;height:100%;text-align:center;}
+.lnb .img {display:inline-block;margin-top:17px;vertical-align:top;}
+.lnb .img-all {width:17px;height:27px;}
+.lnb .img-sleep {width:27px;height:27px;}
+.lnb .img-bathroom {width:24px;height:26px;}
+.lnb .img-outdoor {width:21px;height:27px;}
+
+.sleep-container {position:fixed;top:63px;right:0;bottom:45px;left:0;height:auto;margin:0;padding:0;background:#FFF linear-gradient(to bottom, #FFF, #FAFAFA) no-repeat 50% 50%/100% 100%;font-family: 'Roboto','Noto Sans CJK',Sans-serif !important;}
+.sleep-container .sleep-section-title {margin:0;padding:4.005vw;font-size:4.005vw;text-align:left;}
+.sleep-container button {font-size:inherit;}
+.flick-container {height:100%;overflow:hidden;white-space:nowrap;}
+.flick-container .flick-panel {display:inline-block;overflow-x:hidden;overflow-y:auto;position:relative;box-sizing:border-box;width:100%;height:100%;font-size:14px;vertical-align:top;white-space:normal}
+
+.page-navigation {position:absolute;right:0;bottom:2.67vw;left:0;height:3.738vw;font-size:0;text-align:center;}
+.page-navigation .ball {display:inline-block;width:3.738vw;height:3.738vw;border-radius:50%;background-color:#bbb;}
+.page-navigation .ball + .ball {margin-left:1.335vw;}
+.page-navigation .ball.is-active {background-color:#777;}
+
+.sleep-state {position:relative;z-index:3;padding-top:6.675vw;}
+.sleep-state::after {display:block;clear:both;content:'';}
+.sleep-state .inner {float:right;width:48.06vw;text-align:center;}
+.sleep-state .area-button {padding:0 9.34vw;}
+.sleep-state .area-button:after {display:block;clear:both;content:'';}
+.sleep-state .btn-prev-day {float:left;width:3.738vw;height:5.34vw;margin-left:0.801vw;}
+.sleep-state .btn-prev-day::before {display:inline-block;width:3.204vw;height:3.204vw;margin-top:1.335vw;border:solid #5c5c5c;border-width:0 0 0.801vw 0.801vw;vertical-align:top;transform:rotate(45deg);content:'';}
+.sleep-state .btn-next-day {float:right;width:3.738vw;height:5.34vw;margin-right:0.801vw;}
+.sleep-state .btn-next-day.is-disabled::before {border-color:#ececec;}
+.sleep-state .btn-next-day::before {display:inline-block;width:3.204vw;height:3.204vw;margin-top:1.335vw;border:solid #5c5c5c;border-width:0.801vw 0.801vw 0 0;vertical-align:top;transform:rotate(45deg);content:'';}
+.sleep-state .date {display:block;font-style:normal;font-weight:bold;font-size:5.073vw;color:#0f0f0f;}
+.sleep-state .state {display:block;margin-top:4.272vw;font-weight:normal;font-size:16.287vw;line-height:22.428vw;}
+.sleep-state .average {display:block;font-size:4.005vw;}
+.sleep-state .average em {margin-left:1.602vw;font-style:normal;font-weight:bold;}
+
+.sleep-timestamp {position:absolute;z-index:3;bottom:14.685vw;left:0;padding-left:2.67vw;}
+.sleep-timestamp .area-sleep {float:left;position:relative;padding:0 4.272vw;}
+.sleep-timestamp .area-sleep::after {position:absolute;top:2.136vw;right:0;bottom:2.136vw;width:0.267vw;background-color:#eaeaea;content:'';}
+.sleep-timestamp .area-awake {float:left;padding:0 4.272vw;}
+.sleep-timestamp .data-title {display:block;font-size:4.005vw;}
+.sleep-timestamp .timestamp {display:block;margin-top:-0.267vw;font-weight:500;font-size:9.345vw;line-height:12.015vw;}
+
+.section-range-time {position:absolute;top:4.539vw;left:0;width:49.128vw;height:113.208vw;}
+.section-range-time .time-range {position:absolute;top:0;left:0;width:56.604vw;height:113.208vw;}
+.section-range-time .time-info {position:relative;z-index:1;padding:37.113vw 0 0 5.073vw;}
+.section-range-time .time-info .title {margin:0;padding:0;font-weight:normal;font-size:5.34vw;color:#fff;}
+.section-range-time .time-info .sleep {display:block;margin:-0.801vw 0 0 -2.67vw;padding-right:10.08vw;font-weight:300;font-size:0;text-align:center;white-space:nowrap;color:#fff;}
+.section-range-time .time-info .sleep em {font-style:normal;font-size:13.617vw;letter-spacing:-0.267vw;vertical-align:top}
+.section-range-time .time-info .sleep em:nth-child(3) {margin-left:2.136vw;}
+.section-range-time .time-info .sleep .unit {font-size:6.408vw;line-height:12.282vw;vertical-align:top;}
+.section-range-time .time-info .list {margin-top:4.272vw;padding-left:0.534vw;}
+.section-range-time .time-info .list li {list-style:none;margin:0;color:#fff;}
+.section-range-time .time-info .list li + li {margin-top:2.67vw;}
+.section-range-time .time-info .list-title {display:inline-block;width:17.622vw;height:4.272vw;font-size:4.005vw;line-height:4.272vw;}
+.section-range-time .time-info .list-value {display:inline-block;width:16.02vw;height:4.272vw;font-weight:500;font-size:4.005vw;line-height:4.539vw;}
+.section-range-efficiency {position:absolute;right:0;bottom:13.884vw;width:41.385vw;height:82.77vw;}
+.section-range-efficiency .efficiency-range {position:absolute;top:0;left:0;width:41.385vw;height:82.77vw;}
+.section-range-efficiency .efficiency-info {position:relative;z-index:1;padding:32.307vw 0 0 8.544vw;}
+.section-range-efficiency .efficiency-info .title {margin:0;padding:0;font-weight:normal;font-size:5.34vw;text-align:center;color:#fff;}
+.section-range-efficiency .efficiency-info .efficiency {display:block;margin-top:-1.869vw;font-weight:300;font-size:6.408vw;text-align:center;color:#fff;}
+.section-range-efficiency .efficiency-info .efficiency em {font-style:normal;font-size:13.617vw;letter-spacing:-0.267vw;color:#fff;}
+.section-range-efficiency .efficiency-info .efficiency .unit {vertical-align:0.534vw;}
+
+.footer {position:fixed;right:0;bottom:0;left:0;z-index:100;height:44px;background-color:#fff;border-top:1px solid #e5e4e3;}
+.footer .btn-sort {float:left;width:50px;height:100%;cursor:pointer;}
+.footer .btn-notification {float:right;width:50px;height:100%;cursor:pointer;}
+
+/* temp */
+.notification {padding:4vw;font-size:4vw;}

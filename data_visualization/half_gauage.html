@@ -1,294 +1,198 @@
-<!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width">
-  <title>Title</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,height=device-height,initial-scale=1.0">
+  <link rel="stylesheet" href="./css/fonts.css">
+  <link rel="stylesheet" href="./css/reset.css">
+  <link rel="stylesheet" href="./css/half_gauage.css">
+  <script src="./js/jquery.2.2.4.min.js"></script>
+  <script src="./js/egjs.flicking.js"></script>
+  <script src="./js/gauageRange.js"></script>
 </head>
 <body>
-<svg id="gauage-chart" width="212" height="424">
-  <defs id="chart-defs">
-    <filter id="chart-panel-shadow">
-      <feOffset dx='0' dy='0'></feOffset> <!-- offset -->
-      <feGaussianBlur stdDeviation='4' result='offset-blur'></feGaussianBlur> <!-- blur -->
-      <feComposite operator='out' in='SourceGraphic' in2='offset-blur' result='inverse'></feComposite> <!-- invert -->
-      <feFlood flood-color='black' flood-opacity='0.4' result='color'></feFlood> <!-- color & opacity -->
-      <feComposite operator='in' in='color' in2='inverse' result='shadow'></feComposite> <!-- clip -->
-      <feComposite operator='over' in='shadow' in2='SourceGraphic'></feComposite> <!-- put -->
-    </filter>
-  </defs>
-  <circle id="chart-panel" cx="0" cy="212" r="195" fill="url(#chart-panel-gradient)" stroke-width="24" stroke="#FFF" style="filter:url(#chart-panel-shadow)"></circle>
-  <g id="chart-indicator" transform="translate(0, 212)"></g>
-  <g id="chart-gauage"></g>
-</svg>
-
+<div class="wrap">
+  <!-- 2depth menu tab -->
+  <nav class="lnb">
+    <ul class="inner">
+      <li><a href="#"><object data="./img/icon-activity.svg" type="image/svg+xml" class="img img-all" title="전체"></object></a></li>
+      <li><a href="#"><object id="lnb-sleep-svg" data="./img/icon-sleep.svg" type="image/svg+xml" class="img img-sleep" title="수면"></object></a></li>
+      <li><a href="#"><object data="./img/icon-bathroom.svg" type="image/svg+xml" class="img img-bathroom" title="욕실"></object></a></li>
+      <li><a href="#"><object data="./img/icon-outdoor.svg" type="image/svg+xml" class="img img-outdoor" title="외출"></object></a></li>
+    </ul>
+  </nav>
+  <!-- container -->
+  <main class="sleep-container">
+    <div id="sleep-flicking"  class="flick-container">
+      <!-- Panel 1 -->
+      <div class="flick-panel">
+        <div class="sleep-state">
+          <div class="inner">
+            <div class="area-button">
+              <a href="#" role="button" class="btn-prev-day"></a>
+              <!-- disabled:is-disabled -->
+              <a href="#" role="button" class="btn-next-day is-disabled"></a>
+              <em class="date">9/10</em>
+            </div>
+            <strong id="sleep-state" class="state">양호</strong>
+            <span class="average">평균수면시간<em>05:35</em></span>
+          </div>
+        </div>
+        <div class="sleep-timestamp">
+          <div class="area-sleep">
+            <span class="data-title">잠든시간</span>
+            <strong class="timestamp">00:53</strong>
+          </div>
+          <div class="area-awake">
+            <span class="data-title">일어난시간</span>
+            <strong class="timestamp">07:29</strong>
+          </div>
+        </div>
+        <section class="section-range-time">
+          <div class="time-info">
+            <h2 class="title">수면시간</h2>
+            <strong class="sleep">
+              <em id="time-hour">6</em>
+              <span class="unit">h</span>
+              <em id="time-min">37</em>
+              <span class="unit">m</span>
+            </strong>
+            <ul class="list">
+              <li><span class="list-title">깊은수면</span><span class="list-value">4h 10m</span></li>
+              <li><span class="list-title">깊은수면</span><span class="list-value">6m</span></li>
+            </ul>
+          </div>
+          <svg id="range-time-svg" class="time-range" xmlns="http://www.w3.org/2000/svg"></svg>
+        </section>
+        <section class="section-range-efficiency">
+          <div class="efficiency-info">
+            <h2 class="title">수면효율</h2>
+            <strong class="efficiency"><em id="efficiency">46</em><span class="unit">%</span></strong>
+          </div>
+          <svg id="range-efficiency-svg" class="efficiency-range" xmlns="http://www.w3.org/2000/svg"></svg>
+        </section>
+      </div>
+      <!-- Panel 2 -->
+      <div class="flick-panel">
+        <section>
+          <h2 class="sleep-section-title">일간 수면 상세</h2>
+          <p class="notification">스마트폰 앱 뷰입니다. 모바일로 확인하세요.</p>
+        </section>
+        <section>
+          <h2 class="sleep-section-title">수면 트렌드</h2>
+        </section>
+      </div>
+    </div>
+    <div class="page-navigation">
+      <!-- active:is-active -->
+      <span class="ball is-active"></span>
+      <span class="ball"></span>
+    </div>
+  </main>
+  <!-- footer -->
+  <footer class="footer">
+    <button type="button" class="btn-sort"><img src="./img/icon_sort.svg" alt="정렬"></button>
+    <button type="button" class="btn-notification"><img src="./img/icon_notification.svg" alt="알림"></button>
+  </footer>
+</div>
 <script>
-  var dataPercent = 55;
-  
-  var chartSvg = document.getElementById('gauage-chart');
-  var chartPanelElement = document.getElementById('chart-panel');
-  var indicatorGroup = document.getElementById('chart-indicator');
-  var chartGauageElement = document.getElementById('chart-gauage');
-  var chartDefsElement = document.getElementById('chart-defs');
+    /*
+    [GauageRange Options]
+    - 제한사항: side 옵션이 'left' 일 때, indicators 옵션에 null 값을 넣었을 때 에러가 납니다.
 
-  var gauageIndicators = [null, null, 3, null, null, 6, null, null, 9, null, null];
-  var gauageGradient = ['#FF4B00', null, null, '#FFA800', '#189CE5', null, null, null, null, '#1537E3', '#189CE5', '#FFA800', '#FFA800'];
-  
-  var divisionLength = gauageIndicators.length + 1;
-  var angleUnit = Math.PI / divisionLength;
-  
-  var indicatorRadius = 195;
-  
-  gauageIndicators.forEach(function(indicator, i) {
-    var svgElement = null;
-    var angle = (i + 1) * angleUnit,
-      radianX = Math.sin(angle),
-      radianY = Math.cos(angle);
-    
-    if (indicator === null) {
-      svgElement = createSvgElement({
-        tagName: 'line',
-        attrs: {
-          'x1': (indicatorRadius - 5) * radianX,
-          'y1': -((indicatorRadius - 5) * radianY),
-          'x2': (indicatorRadius + 5) * radianX,
-          'y2': -((indicatorRadius + 5) * radianY),
-          'stroke': '#D6D6D6'
+    - side: 반원의 방향
+    - indicators: 눈금자배열 (null - 눈금자, 숫자/문자열 - 값) (배열의 길이는 구간의 갯수 - 1)
+    - gradient: 색상배열 (중간에 null 을 주면 자동으로 알맞는 색상값 계산) (배열의 길이는 구간의 갯수 + 1)
+    - size.radius: 전체 반원의 반지름
+    - size.indicator: 눈금자 영역의 너비
+    - size.gauage: 게이지 영역의 너비
+    - format: value => percent 함수 (format 함수를 옵션으로 주면, 렌더할 때 해당 함수로 먼저 퍼센트값으로 변환)
+     */
+    $(document).ready(function() {
+      // select elements
+      var rangeTimeSvgEl = document.getElementById('range-time-svg'),
+        rangeEfficiencySvgEl = document.getElementById('range-efficiency-svg'),
+        sleepStateEl = document.getElementById('sleep-state'),
+        lnbSleepSvgEl = document.getElementById('lnb-sleep-svg');
+
+      // calc layout
+      var viewportWidth = $(window).width(),
+        rangeTimeRadius = Math.round(viewportWidth * 212 / 375),
+        rangeEfficiencyRadius = Math.round(viewportWidth * 155 / 375);
+
+      // time range instance
+      var rangeTime = new GauageRange({
+        side: 'right',
+        indicators: [
+          null, null, 3, null, null,
+          6, null, null, 9, null,
+          null
+        ],
+        gradient: [
+          '#FF4B00', null, null, '#FFA800', '#189CE5',
+          null, null, '#1537E3', null, '#1537E3',
+          '#189CE5', '#FFA800', '#FFA800'
+        ],
+        size: {
+          radius: rangeTimeRadius,
+          indicator: 24,
+          gauage: 5
+        },
+        format: function(value) {
+          value = value.toLowerCase();
+          var hour = parseInt(value.substring(0, value.indexOf('h')).trim());
+          var min = parseInt(value.substring(value.indexOf('h') + 1, value.indexOf('m')).trim());
+
+          var totalMin = 720;
+          var sleepMin = hour * 60 + min;
+
+          return Math.round(sleepMin * 100 / totalMin);
         }
       });
-    } else {
-      svgElement = createSvgElement({
-        tagName: 'text',
-        text: indicator,
-        attrs: {
-          'x': (indicatorRadius - 5) * radianX,
-          'y': -((indicatorRadius - 5) * radianY),
-          'dy': radianY < 0 ? 5 : 1,
-          'style': 'font-size:11px;fill:#616161'
+
+      // efficiency range instance
+      var rangeEfficiency = new GauageRange({
+        side: 'left',
+        indicators: [
+          10, 20, 30, 40, 50,
+          60, 70, 80, 90
+        ],
+        gradient: [
+          '#FF4B00', null, '#FF4B00', null, null,
+          '#FFA800', null, '#FFA800', null, '#189CE5',
+          '#1537E3'
+        ],
+        size: {
+          radius: rangeEfficiencyRadius,
+          indicator: 22,
+          gauage: 4
         }
       });
-    }
-    
-    indicatorGroup.appendChild(svgElement);
-  });
 
-  calculateGradientColor(gauageGradient);
+      // render range
+      rangeTime.render(rangeTimeSvgEl, '6h 37m');
+      rangeEfficiency.render(rangeEfficiencySvgEl, 46);
 
-  var startAngle = 0, endAngle = 0,
-    gradientLength = gauageGradient.length - 1,
-    gradientIndex = 0,
-    percentUnit = 100 / gradientLength;
-  
-  while (dataPercent > 0) {
-    var gradientStartColor, gradientEndColor, linecap;
-  
-    if (dataPercent > percentUnit) {
-      startAngle = endAngle;
-      endAngle = startAngle + percentUnit * 1.8;
-      gradientStartColor = gauageGradient[gradientIndex];
-      gradientEndColor = gauageGradient[gradientIndex + 1];
-      linecap = 'butt';
-    } else {
-      startAngle = endAngle;
-      endAngle = startAngle + dataPercent * 1.8;
-      gradientStartColor = gauageGradient[gradientIndex];
-      gradientEndColor = calcGradientPoint(gauageGradient[gradientIndex], gauageGradient[gradientIndex + 1], dataPercent / percentUnit);
-      linecap = 'round';
-    }
-    
-    var gradientId = 'chart-gradient-' + gradientIndex;
-    var gradientAttrs = startAngle > 90
-      ? { x1: '100%', y1: '0%', x2: '0%', y2: '100%' }
-      : { x1: '0%', y1: '0%', x2: '100%', y2: '100%' };
-    var gradientDefElement = createGradientDefElement(gradientId, 'linearGradient', {
-      0: gradientStartColor,
-      100: gradientEndColor
-    }, gradientAttrs);
-    
-    var pathElement = createSvgElement({
-      tagName: 'path',
-      attrs: {
-        'd': describeArc(0, 212, 209, startAngle, endAngle),
-        'stroke': 'url(#' + gradientId + ')',
-        'stroke-width': 5,
-        'stroke-linecap': linecap
-      }
-    });
-  
-    chartDefsElement.appendChild(gradientDefElement);
-    chartGauageElement.appendChild(pathElement);
-    
-    dataPercent -= percentUnit;
-    gradientIndex++;
-  }
-  
-  var panelGradientStart = rgbToHsl(gradientEndColor);
-  var panelGradientEnd = { h: panelGradientStart.h, s: panelGradientStart.s, l: panelGradientStart.l - 12 };
-  
-  var chartPanelGradientDefElement = createGradientDefElement('chart-panel-gradient', 'radialGradient', {
-    0: panelGradientStart,
-    100: panelGradientEnd
-  });
-  
-  chartDefsElement.appendChild(chartPanelGradientDefElement);
-  
-  function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
-    var angleInRadians = (angleInDegrees-90) * Math.PI / 180.0;
-  
-    return {
-      x: centerX + (radius * Math.cos(angleInRadians)),
-      y: centerY + (radius * Math.sin(angleInRadians))
-    };
-  }
+      // set color
+      var color = rangeTime.getCurrentHexColor();
+      sleepStateEl.style.color = color;
+      lnbSleepSvgEl.onload = function() {
+        lnbSleepSvgEl.contentDocument.querySelector('svg').style.color = color;
+      };
 
-  function describeArc(x, y, radius, startAngle, endAngle){
-    var start = polarToCartesian(x, y, radius, endAngle + 1);
-    var end = polarToCartesian(x, y, radius, startAngle - 1);
-    
-    var largeArcFlag = endAngle - startAngle <= 180 ? "0" : "1";
-  
-    return [ "M", start.x, start.y, "A", radius, radius, 0, largeArcFlag, 0, end.x, end.y].join(" ");
-  }
-  
-  function createSvgElement(options) {
-    var xmlns = 'http://www.w3.org/2000/svg';
-    var element = document.createElementNS(xmlns, options.tagName);
-    
-    if (options.text) {
-      element.innerHTML = options.text;
-    }
-  
-    if (options.attrs) {
-      setSvgAttributes(element, options.attrs);
-    }
-    
-    return element;
-  }
-  
-  function createGradientDefElement(id, tagName, colorMap, attrs) {
-    var gradientDef = createSvgElement({ tagName: tagName, attrs: { id: id } });
-    
-    if (attrs) {
-      setSvgAttributes(gradientDef, attrs);
-    }
-    
-    for (var offset in colorMap) {
-      if (colorMap.hasOwnProperty(offset)) {
-        var offsetElement = createSvgElement({
-          tagName: 'stop',
-          attrs: {
-            'offset': offset + '%',
-            'stop-color': toWebColorFormat(colorMap[offset])
-          }
+      // flicking
+      var flicking = new eg.Flicking("#sleep-flicking", {
+        duration: 300,
+        previewPadding: [0, 0]
+      });
+
+      flicking.on('flickEnd', function(e) {
+        var ballElements = document.querySelectorAll('.page-navigation .ball');
+        Array.prototype.forEach.call(ballElements, function(ballElement) {
+          ballElement.className = 'ball';
         });
-        
-        gradientDef.appendChild(offsetElement);
-      }
-    }
-    
-    return gradientDef;
-  }
-  
-  function setSvgAttributes(svg, attrs) {
-    for (var attr in attrs) {
-      if (attrs.hasOwnProperty(attr)) {
-        svg.setAttributeNS(null, attr, attrs[attr]);
-      }
-    }
-  }
-  
-  function calculateGradientColor(gradient) {
-    gradient = unifyColorArray(gradient, 'rgb');
-    
-    for (var i = 1; i < gradient.length - 1; i++) {
-      var color = gradient[i];
-      
-      if (color !== null) continue;
-  
-      var prevColor = gradient[i - 1];
-      var rate, nextColor;
-      
-      for (var j = i + 1; j < gradient.length - 1; j++) {
-        if (gradient[j] !== null) {
-          nextColor = gradient[j];
-          rate = 1 / (j - i  + 1);
-          break;
-        }
-      }
-      
-      gradient[i] = calcGradientPoint(prevColor, nextColor, rate);
-    }
-    
-    return gradient;
-  }
-  
-  function unifyColorArray(gradient, format) {
-    if (format === 'rgb') {
-      gradient.forEach(function(color, i, gradient) {
-        if (typeof color === 'string' && color[0] === '#') {
-          gradient[i] = hexToRgb(color.substr(1));
-        }
+        ballElements[e.no].className = 'ball is-active';
       });
-    }
-    
-    return gradient;
-  }
-  
-  function calcGradientPoint(prevColor, nextColor, rate) {
-    return {
-      r: Math.floor(prevColor.r + (nextColor.r - prevColor.r) * rate),
-      g: Math.floor(prevColor.g + (nextColor.g - prevColor.g) * rate),
-      b: Math.floor(prevColor.b + (nextColor.b - prevColor.b) * rate)
-    };
-  }
-  
-  function toWebColorFormat(colorMap) {
-    var result = '';
-    
-    if (colorMap.hasOwnProperty('r') && colorMap.hasOwnProperty('g') && colorMap.hasOwnProperty('b')) {
-      result = 'rgb(' + colorMap.r + ',' + colorMap.g + ',' + colorMap.b + ')';
-    } else if (colorMap.hasOwnProperty('h') && colorMap.hasOwnProperty('s') && colorMap.hasOwnProperty('l')) {
-      result = 'hsl(' + colorMap.h + ',' + colorMap.s + '%,' + colorMap.l + '%)';
-    }
-    
-    return result;
-  }
-  
-  function hexToRgb(hex) {
-    return {
-      r: parseInt(hex.substring(0, 2), 16),
-      g: parseInt(hex.substring(2, 4), 16),
-      b: parseInt(hex.substring(4, 6), 16)
-    };
-  }
-  
-  function rgbToHsl(rgb) {
-    var r = rgb.r / 255, g = rgb.g / 255, b = rgb.b / 255,
-      max = Math.max(r, g, b), min = Math.min(r, g, b),
-      h = 0, s = 0, l = (max + min) / 2;
-    
-    if (max !== min) {
-      s = l < 0.5 ? (max - min) / (max + min) : (max - min) / (2.0 - max - min);
-      h = r === max ? (g - b) / (max - min) : g === max ? 2.0 + (b - r) / (max - min) : 4.0 + (r - g) / (max - min);
-    }
-  
-    h = h < 0 ? Math.round(h * 60 + 360) : Math.round(h * 60);
-    s = Math.round(s * 100);
-    l = Math.round(l * 100);
-    
-    
-    return { h: h, s: s, l: l }
-  }
-  
-  function rgbToHex(rgb) {
-    return toDoubleDigit(rgb.r.toString(16).toUpperCase())
-      + toDoubleDigit(rgb.g.toString(16).toUpperCase())
-      + toDoubleDigit(rgb.b.toString(16).toUpperCase());
-  }
-  
-  function toDoubleDigit(digit) {
-    return digit.length < 2 ? '0' + digit : digit;
-  }
+    });
 </script>
 </body>
 </html>
